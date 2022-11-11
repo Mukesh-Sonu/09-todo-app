@@ -1,23 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Form from "./Components/Form";
 import TodoList from "./Components/TodoList";
 import "./index.css";
 
 function App() {
-  const [todoList, setTodoList] = useState([]);
+  const [todoList, setTodoList] = useState(() => {
+    return JSON.parse(localStorage.getItem("todoList")) || [];
+  });
   const [dropDownState, setDropDownState] = useState("All");
 
-  const setDeleteItemIndex = (index) => {
-    const newList = todoList.filter((_item, itemIndex) => index !== itemIndex);
+  useEffect(() => {
+    localStorage.setItem("todoList", JSON.stringify(todoList));
+  }, [todoList]);
+
+  const setDeleteItemIndex = (id) => {
+    const newList = todoList.filter((item) => item.id !== id);
     setTodoList([...newList]);
   };
 
-  const setCompleteItemIndex = (index) => {
-    todoList.map((_item, itemIndex) => {
-      if (itemIndex === index) {
-        todoList[index].completed = !todoList[index].completed;
-        setTodoList([...todoList]);
+  const setCompleteItemIndex = (id) => {
+    todoList.map((item) => {
+      if (id === item.id) {
+        item.completed = !item.completed;
       }
+      setTodoList([...todoList]);
       return null;
     });
   };
@@ -36,6 +42,7 @@ function App() {
         todoList={todoList}
         setDeleteItemIndex={setDeleteItemIndex}
         setCompleteItemIndex={setCompleteItemIndex}
+        dropDownState={dropDownState}
       />
     </div>
   );
